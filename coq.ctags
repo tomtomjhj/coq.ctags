@@ -27,7 +27,7 @@
 --map-Coq=+.v
 
 --kinddef-Coq=d,definition,Definition/Example
---kinddef-Coq=a,assumption,Axiom/Conjecture/Parameter/Hypothesis/Variable
+# TODO: --kinddef-Coq=a,assumption,Axiom/Conjecture/Parameter/Hypothesis/Variable
 --kinddef-Coq=t,theorem,Theorem/Lemma/Fact/Remark/Corollary/Proposition/Property
 --kinddef-Coq=i,inductive,Inductive/Coinductive/Variant
 --kinddef-Coq=c,constructor,Inductive/Coinductive/Variant/Record constructor
@@ -50,7 +50,6 @@
 
 # Utils {{{
 # TODO: string https://coq.inria.fr/refman/language/core/basic.html#grammar-token-string
-# TODO: attributes? https://coq.inria.fr/refman/language/core/basic.html#grammar-token-attributes Used for record fields
 --_tabledef-Coq=skipWhiteSpace
 --_tabledef-Coq=skip
 
@@ -114,7 +113,6 @@
 
 # Main {{{
 --_tabledef-Coq=definition
-# TODO assumption
 --_tabledef-Coq=fixpoint
 --_tabledef-Coq=instance
 --_tabledef-Coq=theorem
@@ -168,6 +166,7 @@
 # Inductive {{{
 # https://coq.inria.fr/refman/language/core/inductive.html#coq:cmd.Inductive
 # TODO: constructors_or_record
+# TODO: _ind, ...
 --_tabledef-Coq=skipToConstructors
 --_tabledef-Coq=constructor
 --_tabledef-Coq=skipConstructorRest
@@ -236,7 +235,7 @@
 --_mtable-extend-Coq=recordConstructor+skip
 # explicit constructor
 --_mtable-regex-Coq=recordConstructor/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)\s*\{/\1/c/{pcre2}{tjump=recordField}
-# TODO: implicit constructor must use optscript to get the record name https://github.com/universal-ctags/ctags/commit/bd186360d320c31e9777827dbdda155fdc5641bf
+# TODO: implicit constructor. Use scope and optscript to get the record name https://github.com/universal-ctags/ctags/commit/bd186360d320c31e9777827dbdda155fdc5641bf
 --_mtable-regex-Coq=recordConstructor/\{//{pcre2}{tjump=recordField}
 
 --_mtable-extend-Coq=recordField+skip
