@@ -10,8 +10,9 @@
 # the start of string. So instead, eat any non-keyword word, so that the start
 # position is always at the start of a word.
 #
-# NOTE unicode identifier: https://github.com/rouge-ruby/rouge/pull/1764
-# TODO: this doesn't work! Example `Inductive εμπτγ :=.`
+# NOTE unicode identifier: ((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*) https://github.com/rouge-ruby/rouge/pull/1764
+# TODO: this doesn't work! Example: `Inductive εμπτγ :=.` ⇒ [ILLEGAL BYTE in line XXX]. Bug?
+# Use `([^@|({[`:[:space:]]+)` ?
 
 --langdef=Coq
 --map-Coq=+.v
@@ -31,6 +32,7 @@
 --_tabledef-Coq=instance
 --_tabledef-Coq=theorem
 --_tabledef-Coq=inductive
+--_tabledef-Coq=record
 --_tabledef-Coq=ltac
 
 #
@@ -59,7 +61,7 @@
 --_mtable-extend-Coq=skip+skipComment
 
 --_tabledef-Coq=skipToNextSentence
---_mtable-regex-Coq=skipToNextSentence/\.[[:space:]]//{tleave}
+--_mtable-regex-Coq=skipToNextSentence/\.\s//{pcre2}{tleave}
 --_mtable-regex-Coq=skipToNextSentence/.//
 
 #
@@ -111,8 +113,6 @@
 # NOTE: see word boundary note
 --_mtable-regex-Coq=skipTerm/match\b//{pcre2}{tenter=match}
 
-# --_mtable-regex-Coq=skipName/(?:\p{L}|_)(?:\p{L}|\p{N}|_|')*//
-
 
 #
 # Main
@@ -124,6 +124,9 @@
 --_mtable-regex-Coq=main/Instance\b//{pcre2}{tenter=instance}
 --_mtable-regex-Coq=main/(?:Theorem|Lemma|Fact|Remark|Corollary|Proposition|Property)\b//{pcre2}{tenter=theorem}
 --_mtable-regex-Coq=main/(?:Inductive|CoInductive|Variant)\b//{pcre2}{tenter=inductive}
+# TODO: canonical structure (only the form with :=) https://coq.inria.fr/refman/language/extensions/canonical.html#coq:cmd.Canonical-Structure
+--_mtable-regex-Coq=main/Canonical\s+Structure\b//{pcre2}{tenter=skipToNextSentence}
+--_mtable-regex-Coq=main/(?:Record|Structure|Class)\b//{pcre2}{tenter=record}
 --_mtable-regex-Coq=main/Ltac\b//{pcre2}{tenter=ltac}
 --_mtable-regex-Coq=main/\w+//{pcre2}
 --_mtable-regex-Coq=main/.//
@@ -131,7 +134,6 @@
 
 # Definition https://coq.inria.fr/refman/language/core/definitions.html#coq:cmd.Definition
 --_mtable-extend-Coq=definition+skip
---_mtable-regex-Coq=definition/((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\1/d/{pcre2}{tjump=skipToNextSentence}
 --_mtable-regex-Coq=definition/((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\1/d/{pcre2}{tjump=skipToNextSentence}
 
 
@@ -158,13 +160,14 @@
 --_tabledef-Coq=skipToConstructors
 --_tabledef-Coq=constructor
 --_tabledef-Coq=skipConstructorRest
+
 --_mtable-extend-Coq=inductive+skip
 --_mtable-regex-Coq=inductive/>//
 --_mtable-regex-Coq=inductive/((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\1/i/{pcre2}{tjump=skipToConstructors}
 
-# skip terms until :=
+# skip binders/terms until :=
 --_mtable-extend-Coq=skipToConstructors+skip
---_mtable-extend-Coq=skipToConstructors+skipEnclosed
+--_mtable-extend-Coq=skipToConstructors+skipTerm
 --_mtable-regex-Coq=skipToConstructors/:=//{pcre2}{tjump=constructor}
 # := can be missing
 --_mtable-regex-Coq=skipToConstructors/\.\s//{pcre2}{tleave}
@@ -182,39 +185,54 @@
 # next constructor
 --_mtable-regex-Coq=skipConstructorRest/\|//{pcre2}{tjump=constructor}
 # end of Inductive
---_mtable-regex-Coq=skipConstructorRest/\.[[:space:]]//{tleave}
+--_mtable-regex-Coq=skipConstructorRest/\.\s//{pcre2}{tleave}
 # mutually recursive
 --_mtable-regex-Coq=skipConstructorRest/with\b//{pcre2}{tjump=inductive}
 --_mtable-regex-Coq=skipConstructorRest/\w+//{pcre2}
 --_mtable-regex-Coq=skipConstructorRest/.//
 
-# TODO: canonical structure (only the form with :=)
-# --_mtable-regex-Coq=main/(Record|Structure|Class)[[:space:]>]+((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\2/r/{pcre2}
+
+# Record https://coq.inria.fr/refman/language/core/records.html#coq:cmd.Record
 # TODO: singleton_class_definition  https://coq.inria.fr/refman/addendum/type-classes.html#coq:cmd.Class
-# TODO record: constructor: Build_\n
-# --_tabledef-Coq=record
-# --_tabledef-Coq=record_constructor
-# --_tabledef-Coq=fields
-# --_mtable-extend-Coq=record+skip
-# --_mtable-regex-Coq=main/(Record|Structure|Class)[[:space:]>]+((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\2/r/{pcre2}{tenter=record}
-# --_mtable-regex-Coq=record/\(\*//{tenter=comment}
-# # skip terms until :=
-# --_mtable-regex-Coq=record/\(//{tenter=paren}
-# --_mtable-regex-Coq=record/\{//{tenter=brace}
-# --_mtable-regex-Coq=record/\[//{tenter=bracket}
-# --_mtable-regex-Coq=record/:=//{tjump=record_constructor}
-# # := can be missing
-# --_mtable-regex-Coq=record/\.[[:space:]]//{tleave}
-# # explicit constructor
-# --_mtable-regex-Coq=record_constructor/:=[[:space:]]*((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)[[:space:]]*\{//{pcre2}{tjump=fields}
-# # TODO: implicit constructor must use optscript to get the record name https://github.com/universal-ctags/ctags/commit/bd186360d320c31e9777827dbdda155fdc5641bf
-# --_mtable-regex-Coq=record_constructor/:=[[:space:]]*\{//{tjump=fields}
-# --_mtable-regex-Coq=record/.//
-# # TODO `with`
-# # TODO: this generates a lot of weird stuff.. should match braces...
-# # --_mtable-regex-Coq=record/[{;][[:space:]]*((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)[^:]*:/\1/f/{pcre2}
-# --_mtable-regex-Coq=record/}[[:space:]]*\.//{tleave}
-# --_mtable-regex-Coq=record/.//
+# TODO `with`
+--_tabledef-Coq=skipToRecordConstructor
+--_tabledef-Coq=recordConstructor
+--_tabledef-Coq=recordField
+--_tabledef-Coq=skipRecordFieldRest
+
+--_mtable-extend-Coq=record+skip
+--_mtable-regex-Coq=record/>//
+--_mtable-regex-Coq=record/((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\1/r/{pcre2}{tjump=skipToRecordConstructor}
+
+# skip binders/terms until :=
+--_mtable-extend-Coq=skipToRecordConstructor+skip
+--_mtable-extend-Coq=skipToRecordConstructor+skipEnclosed
+--_mtable-regex-Coq=skipToRecordConstructor/:=//{pcre2}{tjump=recordConstructor}
+# := can be missing
+--_mtable-regex-Coq=skipToRecordConstructor/\.\s//{pcre2}{tleave}
+--_mtable-regex-Coq=skipToRecordConstructor/.//{pcre2}
+
+--_mtable-extend-Coq=recordConstructor+skip
+# explicit constructor
+--_mtable-regex-Coq=recordConstructor/((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)\s*\{/\1/c/{pcre2}{tjump=recordField}
+# TODO: implicit constructor must use optscript to get the record name https://github.com/universal-ctags/ctags/commit/bd186360d320c31e9777827dbdda155fdc5641bf
+--_mtable-regex-Coq=recordConstructor/\{//{pcre2}{tjump=recordField}
+
+# TODO: skip attributes
+--_mtable-extend-Coq=recordField+skip
+--_mtable-regex-Coq=recordField/((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\1/f/{pcre2}{tjump=skipRecordFieldRest}
+# no field
+--_mtable-regex-Coq=recordField/\}\.\s//{pcre2}{tleave}
+--_mtable-regex-Coq=recordField/.//
+
+--_mtable-extend-Coq=skipRecordFieldRest+skip
+--_mtable-extend-Coq=skipRecordFieldRest+skipEnclosed
+# next field
+--_mtable-regex-Coq=skipRecordFieldRest/;//{pcre2}{tjump=recordField}
+# end of record
+--_mtable-regex-Coq=skipRecordFieldRest/\}\.\s//{pcre2}{tleave}
+--_mtable-regex-Coq=skipRecordFieldRest/.//{pcre2}
+
 
 # Ltac https://coq.inria.fr/refman/proof-engine/ltac.html#coq:cmd.Ltac
 --_mtable-extend-Coq=ltac+skip
