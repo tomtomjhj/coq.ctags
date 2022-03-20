@@ -5,9 +5,13 @@
 # NOTE(word boundary): (pcre2) \b at the beginning of the pattern since we're
 # always at the start of string. So instead, eat any non-keyword word, so that
 # the start position is always at the start of a word.
+# Word end can be emulated with POSIX ERE
+#     []!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^] ([:punct:] without ' and _),
+# but this consumes the char, so breaks things like `(match ... end)`.
+# So we can't avoid PCRE2.
 #
 # NOTE(unicode identifier): ((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*) https://github.com/rouge-ruby/rouge/pull/1764
-# TODO: this doesn't work! Example: `Inductive εμπτγ :=.` ⇒ [ILLEGAL BYTE in line XXX]. Bug?
+# TODO: This doesn't work! Example: `Inductive εμπτη :=.` ⇒ [ILLEGAL BYTE in line XXX]. Bug?
 # Alternative: [^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*
 #              (       first letter                       )(        sebsequent letters                )
 # - based on [:punct:]
@@ -18,35 +22,22 @@
 # - subsequent letters don't exclude '
 #
 # NOTE: blank = [ \t\n] https://coq.inria.fr/refman/language/core/basic.html#lexical-conventions
-#
-# NOTE: word end = []!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^] ([:punct:] without ' and _)
-# But this consumes the char, so breaks things like `(match ... end)`. So we can't avoid PCRE2.
 
 --langdef=Coq
 --map-Coq=+.v
 
---kinddef-Coq=d,definition,IsDefinition
---kinddef-Coq=a,assumption,IsAssumption
---kinddef-Coq=t,theorem,IsProof
---kinddef-Coq=i,inductive,Inductive
---kinddef-Coq=c,constructor,Constructor
+--kinddef-Coq=d,definition,Definition/Example
+--kinddef-Coq=a,assumption,Axiom/Conjecture/Parameter/Hypothesis/Variable
+--kinddef-Coq=t,theorem,Theorem/Lemma/Fact/Remark/Corollary/Proposition/Property
+--kinddef-Coq=i,inductive,Inductive/Coinductive/Variant
+--kinddef-Coq=c,constructor,Inductive/Coinductive/Variant/Record constructor
 --kinddef-Coq=r,record,Record/Class
---kinddef-Coq=f,field,Field
+--kinddef-Coq=f,field,Record field, Class method
 --kinddef-Coq=l,ltac,Ltac
 
 --_tabledef-Coq=main
---_tabledef-Coq=definition
---_tabledef-Coq=fixpoint
---_tabledef-Coq=instance
---_tabledef-Coq=theorem
---_tabledef-Coq=inductive
---_tabledef-Coq=canonical
---_tabledef-Coq=record
---_tabledef-Coq=ltac
 
-#
-# Comment
-#
+# Comment {{{
 --_tabledef-Coq=comment
 # allow nested comment
 --_mtable-regex-Coq=comment/\(\*//{tenter=comment}
@@ -55,10 +46,9 @@
 
 --_tabledef-Coq=skipComment
 --_mtable-regex-Coq=skipComment/\(\*//{tenter=comment}
+# }}}
 
-#
-# Utils
-#
+# Utils {{{
 # TODO: string https://coq.inria.fr/refman/language/core/basic.html#grammar-token-string
 # TODO: attributes? https://coq.inria.fr/refman/language/core/basic.html#grammar-token-attributes Used for record fields
 --_tabledef-Coq=skipWhiteSpace
@@ -72,10 +62,9 @@
 --_tabledef-Coq=skipToNextSentence
 --_mtable-regex-Coq=skipToNextSentence/\.\s//{pcre2}{tleave}
 --_mtable-regex-Coq=skipToNextSentence/.//
+# }}}
 
-#
-# Term and Binder
-#
+# Term and Binder {{{
 --_tabledef-Coq=paren
 --_tabledef-Coq=brace
 --_tabledef-Coq=bracket
@@ -121,11 +110,19 @@
 --_mtable-extend-Coq=skipTerm+skipEnclosed
 # NOTE: see word boundary note
 --_mtable-regex-Coq=skipTerm/match\b//{pcre2}{tenter=match}
+# }}}
 
+# Main {{{
+--_tabledef-Coq=definition
+# TODO assumption
+--_tabledef-Coq=fixpoint
+--_tabledef-Coq=instance
+--_tabledef-Coq=theorem
+--_tabledef-Coq=inductive
+--_tabledef-Coq=canonical
+--_tabledef-Coq=record
+--_tabledef-Coq=ltac
 
-#
-# Main
-#
 --_mtable-extend-Coq=main+skipComment
 --_mtable-regex-Coq=main/(?:Definition|Example)\b//{pcre2}{tenter=definition}
 --_mtable-regex-Coq=main/(?:Fixpoint|CoFixpoint)\b//{pcre2}{tenter=fixpoint}
@@ -138,32 +135,38 @@
 --_mtable-regex-Coq=main/Ltac\b//{pcre2}{tenter=ltac}
 --_mtable-regex-Coq=main/\w+//{pcre2}
 --_mtable-regex-Coq=main/.//
+# }}}
 
-
-# Definition https://coq.inria.fr/refman/language/core/definitions.html#coq:cmd.Definition
+# Definition {{{
+# https://coq.inria.fr/refman/language/core/definitions.html#coq:cmd.Definition
 --_mtable-extend-Coq=definition+skip
 --_mtable-regex-Coq=definition/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{pcre2}{tjump=skipToNextSentence}
+# }}}
 
-
-# Fixpoint https://coq.inria.fr/refman/language/core/inductive.html#coq:cmd.Fixpoint
+# Fixpoint {{{
+# https://coq.inria.fr/refman/language/core/inductive.html#coq:cmd.Fixpoint
 # TODO: with
 --_mtable-extend-Coq=fixpoint+skip
 --_mtable-regex-Coq=fixpoint/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{pcre2}{tjump=skipToNextSentence}
+# }}}
 
-# Instance https://coq.inria.fr/refman/addendum/type-classes.html#coq:cmd.Instance
+# Instance {{{
+# https://coq.inria.fr/refman/addendum/type-classes.html#coq:cmd.Instance
 --_mtable-extend-Coq=instance+skip
 --_mtable-regex-Coq=instance/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{pcre2}{tjump=skipToNextSentence}
 # anonymouse instance
 --_mtable-regex-Coq=instance/.//{pcre2}{tjump=skipToNextSentence}
+# }}}
 
-
-# Theorem https://coq.inria.fr/refman/language/core/definitions.html#coq:cmd.Theorem
+# Theorem {{{
+# https://coq.inria.fr/refman/language/core/definitions.html#coq:cmd.Theorem
 # TODO: with
 --_mtable-extend-Coq=theorem+skip
 --_mtable-regex-Coq=theorem/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/t/{pcre2}{tjump=skipToNextSentence}
+# }}}
 
-
-# Inductive https://coq.inria.fr/refman/language/core/inductive.html#coq:cmd.Inductive
+# Inductive {{{
+# https://coq.inria.fr/refman/language/core/inductive.html#coq:cmd.Inductive
 # TODO: constructors_or_record
 --_tabledef-Coq=skipToConstructors
 --_tabledef-Coq=constructor
@@ -198,17 +201,19 @@
 --_mtable-regex-Coq=skipConstructorRest/with\b//{pcre2}{tjump=inductive}
 --_mtable-regex-Coq=skipConstructorRest/\w+//{pcre2}
 --_mtable-regex-Coq=skipConstructorRest/.//
+# }}}
 
-
-# Canonical structure https://coq.inria.fr/refman/language/extensions/canonical.html#coq:cmd.Canonical-Structure
+# Canonical Structure {{{
+# https://coq.inria.fr/refman/language/extensions/canonical.html#coq:cmd.Canonical-Structure
 --_mtable-extend-Coq=canonical+skip
 # reference: just skip. TODO: reference https://coq.inria.fr/refman/proof-engine/vernacular-commands.html#grammar-token-reference
 --_mtable-regex-Coq=canonical/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)\s*\.\s//{pcre2}{tleave}
 # definition
 --_mtable-regex-Coq=canonical/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{pcre2}{tjump=skipToNextSentence}
+# }}}
 
-
-# Record https://coq.inria.fr/refman/language/core/records.html#coq:cmd.Record
+# Record {{{
+# https://coq.inria.fr/refman/language/core/records.html#coq:cmd.Record
 # TODO: singleton_class_definition  https://coq.inria.fr/refman/addendum/type-classes.html#coq:cmd.Class
 # TODO `with`
 --_tabledef-Coq=skipToRecordConstructor
@@ -251,11 +256,12 @@
 # end of record
 --_mtable-regex-Coq=skipRecordFieldRest/\}\.\s//{pcre2}{tleave}
 --_mtable-regex-Coq=skipRecordFieldRest/.//{pcre2}
+# }}}
 
-
-# Ltac https://coq.inria.fr/refman/proof-engine/ltac.html#coq:cmd.Ltac
+# Ltac {{{
+# https://coq.inria.fr/refman/proof-engine/ltac.html#coq:cmd.Ltac
 --_mtable-extend-Coq=ltac+skip
 --_mtable-regex-Coq=ltac/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/l/{pcre2}{tjump=skipToNextSentence}
+# }}}
 
-
-# vim:set ft=conf:
+# vim:set ft=conf fdm=marker:
