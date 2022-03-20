@@ -1,14 +1,10 @@
-# TODO:
-# - all table should jump to comment
-# - all table must have /./
-#
 # TODO: {pcre2} by default? https://github.com/universal-ctags/ctags/issues/3181
 #
 # NOTE: end of sentence can be eof. this shouldn't be problem for files with newline at eof
 #
-# NOTE(word boundary): \b at the beginning of the pattern since we're always at
-# the start of string. So instead, eat any non-keyword word, so that the start
-# position is always at the start of a word.
+# NOTE(word boundary): (pcre2) \b at the beginning of the pattern since we're
+# always at the start of string. So instead, eat any non-keyword word, so that
+# the start position is always at the start of a word.
 #
 # NOTE(unicode identifier): ((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*) https://github.com/rouge-ruby/rouge/pull/1764
 # TODO: this doesn't work! Example: `Inductive εμπτγ :=.` ⇒ [ILLEGAL BYTE in line XXX]. Bug?
@@ -245,12 +241,14 @@
 --_mtable-extend-Coq=recordField+skipEnclosed
 --_mtable-regex-Coq=recordField/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/f/{tjump=skipRecordFieldRest}
 # no field
+# TODO must `skip` at the end of the record
 --_mtable-regex-Coq=recordField/\}\.[ \t\n]//{tleave}
 --_mtable-regex-Coq=recordField/.//
 
 --_mtable-extend-Coq=skipRecordFieldRest+skip
 --_mtable-extend-Coq=skipRecordFieldRest+skipEnclosed
 # next field
+# NOTE: not perfect since notation can contain `;`
 --_mtable-regex-Coq=skipRecordFieldRest/;//{tjump=recordField}
 # end of record
 --_mtable-regex-Coq=skipRecordFieldRest/\}\.[ \t\n]//{tleave}
