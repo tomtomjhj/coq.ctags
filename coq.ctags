@@ -244,8 +244,7 @@
 --_mtable-extend-Coq=recordField+skipEnclosed
 --_mtable-regex-Coq=recordField/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/f/{pcre2}{tjump=skipRecordFieldRest}
 # no field
-# TODO must `skip` at the end of the record
---_mtable-regex-Coq=recordField/\}\.\s//{pcre2}{tleave}
+--_mtable-regex-Coq=recordField/\}//{pcre2}{tjump=skipToNextSentence}
 --_mtable-regex-Coq=recordField/.//
 
 --_mtable-extend-Coq=skipRecordFieldRest+skip
@@ -254,7 +253,7 @@
 # NOTE: not perfect since notation can contain `;`
 --_mtable-regex-Coq=skipRecordFieldRest/;//{pcre2}{tjump=recordField}
 # end of record
---_mtable-regex-Coq=skipRecordFieldRest/\}\.\s//{pcre2}{tleave}
+--_mtable-regex-Coq=skipRecordFieldRest/\}//{pcre2}{tjump=skipToNextSentence}
 --_mtable-regex-Coq=skipRecordFieldRest/.//{pcre2}
 # }}}
 
