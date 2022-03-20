@@ -13,6 +13,7 @@
 # TODO:
 # - all table should jump to comment
 # - all table must have /./
+# - --_mtable-extend ?
 --_tabledef-Coq=toplevel
 --_tabledef-Coq=record
 --_tabledef-Coq=fields
@@ -24,19 +25,15 @@
 # NOTE to disambiguate `with` of term `match` and vernac
 --_tabledef-Coq=match
 
-# TODO: end of sentence can be eof. this shouldn't be problem for files with newline at eof
-# TODO: wrap keywords with word boundary? how? eat spaces first? → PCRE?
-# TODO: unicode identifier? → PCRE?
-#   https://github.com/rouge-ruby/rouge/pull/1764
+# TODO: {pcre2} by default? https://github.com/universal-ctags/ctags/issues/3181
 #
-# NOTE: [^@|({[`:[:space:]]
-#         ^^ for inductive's def
-#
-# TODO: {pcre2} by default
+# NOTE: end of sentence can be eof. this shouldn't be problem for files with newline at eof
 #
 # NOTE word boundary: \b at the beginning of the pattern since we're always at
 # the start of string. So instead, eat any non-keyword word, so that the start
 # position is always at the start of a word.
+#
+# NOTE unicode identifier: https://github.com/rouge-ruby/rouge/pull/1764
 
 # NOTE: assumes that parens/braces/brackets in terms are well-matched
 --_mtable-regex-Coq=paren/\(\*//{tenter=comment}
@@ -78,17 +75,17 @@
 
 --_mtable-regex-Coq=toplevel/\(\*//{tenter=comment}
 # TODO: with
---_mtable-regex-Coq=toplevel/(Definition|Example)[[:space:]]+([^({[`:[:space:]]+)/\2/d/
---_mtable-regex-Coq=toplevel/(Fixpoint|CoFixpoint)[[:space:]]+([^({[`:[:space:]]+)/\2/d/
+--_mtable-regex-Coq=toplevel/(Definition|Example)[[:space:]]+((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\2/d/{pcre2}
+--_mtable-regex-Coq=toplevel/(Fixpoint|CoFixpoint)[[:space:]]+((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\2/d/{pcre2}
 --_mtable-regex-Coq=toplevel/Existing[[:space:]]+Instances?//
---_mtable-regex-Coq=toplevel/Instance[[:space:]]+([^({[`:[:space:]]+)/\1/d/
---_mtable-regex-Coq=toplevel/(Theorem|Lemma|Fact|Remark|Corollary|Proposition|Property)[[:space:]]+([^({[`:[:space:]]+)/\2/t/
+--_mtable-regex-Coq=toplevel/Instance[[:space:]]+((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\1/d/{pcre2}
+--_mtable-regex-Coq=toplevel/(Theorem|Lemma|Fact|Remark|Corollary|Proposition|Property)[[:space:]]+((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\2/t/{pcre2}
 
 --_tabledef-Coq=inductive
-# TODO: can have record (constructors_or_record)
+# TODO: constructors_or_record https://coq.inria.fr/refman/language/core/inductive.html#coq:cmd.Inductive
 --_tabledef-Coq=constructors
 --_tabledef-Coq=constructor
---_mtable-regex-Coq=toplevel/(Inductive|CoInductive|Variant)[[:space:]>]+([^@|({[`:[:space:]]+)/\2/i/{tenter=inductive}
+--_mtable-regex-Coq=toplevel/(Inductive|CoInductive|Variant)[[:space:]>]+((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\2/i/{pcre2}{tenter=inductive}
 --_mtable-regex-Coq=inductive/\(\*//{tenter=comment}
 # skip terms until :=
 --_mtable-regex-Coq=inductive/\(//{tenter=paren}
@@ -99,7 +96,7 @@
 --_mtable-regex-Coq=inductive/\.[[:space:]]//{tleave}
 --_mtable-regex-Coq=inductive/.//
 --_mtable-regex-Coq=constructors/\(\*//{tenter=comment}
---_mtable-regex-Coq=constructors/([[:alpha:]_][^.({[`:[:space:]]*)/\1/c/{tjump=constructor}
+--_mtable-regex-Coq=constructors/((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\1/c/{pcre2}{tjump=constructor}
 # skip the optional initial `|`
 --_mtable-regex-Coq=constructors/\|//
 # no constructor
@@ -115,17 +112,18 @@
 # end of Inductive
 --_mtable-regex-Coq=constructor/\.[[:space:]]//{tleave}
 # mutually recursive
---_mtable-regex-Coq=constructor/with\b[[:space:]>]+([^@|({[`:[:space:]]+)/\1/i/{pcre2}{tjump=inductive}
+--_mtable-regex-Coq=constructor/with[[:space:]>]+((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\1/i/{pcre2}{tjump=inductive}
 --_mtable-regex-Coq=constructor/\w+//{pcre2}
 --_mtable-regex-Coq=constructor/.//
 
 # TODO: canonical structure (only the form with :=)
-# --_mtable-regex-Coq=toplevel/(Record|Structure|Class)[[:space:]>]+([^@|({[`:[:space:]]+)/\2/r/
-# TODO record: constructor
-#   Build_\n
-# TODO record: fields
-# TODO record: singleton
-# --_mtable-regex-Coq=toplevel/(Record|Structure|Class)[[:space:]>]+([^@|({[`:[:space:]]+)/\2/r/{tenter=record}
+# --_mtable-regex-Coq=toplevel/(Record|Structure|Class)[[:space:]>]+((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\2/r/{pcre2}
+# TODO: singleton_class_definition  https://coq.inria.fr/refman/addendum/type-classes.html#coq:cmd.Class
+# TODO record: constructor: Build_\n
+# --_tabledef-Coq=record
+# --_tabledef-Coq=record_constructor
+# --_tabledef-Coq=fields
+# --_mtable-regex-Coq=toplevel/(Record|Structure|Class)[[:space:]>]+((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\2/r/{pcre2}{tenter=record}
 # --_mtable-regex-Coq=record/\(\*//{tenter=comment}
 # # skip terms until :=
 # --_mtable-regex-Coq=record/\(//{tenter=paren}
@@ -134,14 +132,18 @@
 # --_mtable-regex-Coq=record/:=//{tjump=record_constructor}
 # # := can be missing
 # --_mtable-regex-Coq=record/\.[[:space:]]//{tleave}
+# # explicit constructor
+# --_mtable-regex-Coq=record_constructor/:=[[:space:]]*((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)[[:space:]]*\{//{pcre2}{tjump=fields}
+# # TODO: implicit constructor must use optscript to get the record name https://github.com/universal-ctags/ctags/commit/bd186360d320c31e9777827dbdda155fdc5641bf
+# --_mtable-regex-Coq=record_constructor/:=[[:space:]]*\{//{tjump=fields}
 # --_mtable-regex-Coq=record/.//
 # # TODO `with`
 # # TODO: this generates a lot of weird stuff.. should match braces...
-# # --_mtable-regex-Coq=record/[{;][[:space:]]*([[:alpha:]_][^@|({[`:[:space:]]*)[^:]*:/\1/f/
+# # --_mtable-regex-Coq=record/[{;][[:space:]]*((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)[^:]*:/\1/f/{pcre2}
 # --_mtable-regex-Coq=record/}[[:space:]]*\.//{tleave}
 # --_mtable-regex-Coq=record/.//
 
---_mtable-regex-Coq=toplevel/Ltac[[:space:]]+([^:[:space:]]+)/\1/l/
+--_mtable-regex-Coq=toplevel/Ltac[[:space:]]+((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\1/l/{pcre2}
 
 --_mtable-regex-Coq=toplevel/\w+//{pcre2}
 --_mtable-regex-Coq=toplevel/.//
