@@ -20,7 +20,7 @@
 # NOTE: blank = [ \t\n] https://coq.inria.fr/refman/language/core/basic.html#lexical-conventions
 #
 # NOTE: word end = []!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^] ([:punct:] without ' and _)
-# - note: annoymouse instance
+# But this consumes the char, so breaks things like `(match ... end)`. So we can't avoid PCRE2.
 
 --langdef=Coq
 --map-Coq=+.v
@@ -64,13 +64,13 @@
 --_tabledef-Coq=skipWhiteSpace
 --_tabledef-Coq=skip
 
---_mtable-regex-Coq=skipWhiteSpace/[ \t\n]+//
+--_mtable-regex-Coq=skipWhiteSpace/\s+//{pcre2}
 
 --_mtable-extend-Coq=skip+skipWhiteSpace
 --_mtable-extend-Coq=skip+skipComment
 
 --_tabledef-Coq=skipToNextSentence
---_mtable-regex-Coq=skipToNextSentence/\.[ \t\n]//{tleave}
+--_mtable-regex-Coq=skipToNextSentence/\.\s//{pcre2}{tleave}
 --_mtable-regex-Coq=skipToNextSentence/.//
 
 #
@@ -86,83 +86,81 @@
 --_tabledef-Coq=skipTerm
 
 # NOTE: assumes that parens/braces/brackets in terms are well-matched
---_mtable-regex-Coq=skipEnclosed/\(//{tenter=paren}
---_mtable-regex-Coq=skipEnclosed/\{//{tenter=brace}
---_mtable-regex-Coq=skipEnclosed/\[//{tenter=bracket}
+--_mtable-regex-Coq=skipEnclosed/\(//{pcre2}{tenter=paren}
+--_mtable-regex-Coq=skipEnclosed/\{//{pcre2}{tenter=brace}
+--_mtable-regex-Coq=skipEnclosed/\[//{pcre2}{tenter=bracket}
 
 --_mtable-extend-Coq=paren+skipComment
 --_mtable-extend-Coq=paren+skipEnclosed
 --_mtable-regex-Coq=paren/\)//{tleave}
---_mtable-regex-Coq=paren/match[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tenter=match}
---_mtable-regex-Coq=paren/[[:alnum:]_]+//
+--_mtable-regex-Coq=paren/match\b//{pcre2}{tenter=match}
+--_mtable-regex-Coq=paren/\w+//{pcre2}
 --_mtable-regex-Coq=paren/.//
 
 --_mtable-extend-Coq=brace+skipComment
 --_mtable-extend-Coq=brace+skipEnclosed
 --_mtable-regex-Coq=brace/\}//{tleave}
---_mtable-regex-Coq=brace/match[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tenter=match}
---_mtable-regex-Coq=brace/[[:alnum:]_]+//
+--_mtable-regex-Coq=brace/match\b//{pcre2}{tenter=match}
+--_mtable-regex-Coq=brace/\w+//{pcre2}
 --_mtable-regex-Coq=brace/.//
 
 --_mtable-extend-Coq=bracket+skipComment
 --_mtable-extend-Coq=bracket+skipEnclosed
 --_mtable-regex-Coq=bracket/\]//{tleave}
---_mtable-regex-Coq=bracket/match[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tenter=match}
---_mtable-regex-Coq=bracket/[[:alnum:]_]+//
+--_mtable-regex-Coq=bracket/match\b//{pcre2}{tenter=match}
+--_mtable-regex-Coq=bracket/\w+//{pcre2}
 --_mtable-regex-Coq=bracket/.//
 
 --_mtable-extend-Coq=match+skipComment
 --_mtable-extend-Coq=bracket+skipEnclosed
---_mtable-regex-Coq=match/end[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tleave}
---_mtable-regex-Coq=match/match[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tenter=match}
---_mtable-regex-Coq=match/[[:alnum:]_]+//
+--_mtable-regex-Coq=match/end\b//{pcre2}{tleave}
+--_mtable-regex-Coq=match/match\b//{pcre2}{tenter=match}
+--_mtable-regex-Coq=match/\w+//{pcre2}
 --_mtable-regex-Coq=match/.//
 
 --_mtable-extend-Coq=skipTerm+skipEnclosed
 # NOTE: see word boundary note
---_mtable-regex-Coq=skipTerm/match[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tenter=match}
+--_mtable-regex-Coq=skipTerm/match\b//{pcre2}{tenter=match}
 
 
 #
 # Main
 #
 --_mtable-extend-Coq=main+skipComment
---_mtable-regex-Coq=main/(Definition|Example)[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tenter=definition}
---_mtable-regex-Coq=main/(Fixpoint|CoFixpoint)[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tenter=fixpoint}
---_mtable-regex-Coq=main/Existing[ \t\n]+Instances?[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tenter=skipToNextSentence}
-# anonymous instance
---_mtable-regex-Coq=main/Instance[ \t\n]*://{tenter=skipToNextSentence}
---_mtable-regex-Coq=main/Instance[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tenter=instance}
---_mtable-regex-Coq=main/(Theorem|Lemma|Fact|Remark|Corollary|Proposition|Property)[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tenter=theorem}
---_mtable-regex-Coq=main/(Inductive|CoInductive|Variant)[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tenter=inductive}
---_mtable-regex-Coq=main/Canonical([ \t\n]+Structure)?[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tenter=canonical}
---_mtable-regex-Coq=main/(Record|Structure|Class)[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tenter=record}
---_mtable-regex-Coq=main/Ltac[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tenter=ltac}
---_mtable-regex-Coq=main/[[:alnum:]_]+//
+--_mtable-regex-Coq=main/(?:Definition|Example)\b//{pcre2}{tenter=definition}
+--_mtable-regex-Coq=main/(?:Fixpoint|CoFixpoint)\b//{pcre2}{tenter=fixpoint}
+--_mtable-regex-Coq=main/Existing\s+Instances?\b//{pcre2}{tenter=skipToNextSentence}
+--_mtable-regex-Coq=main/Instance\b//{pcre2}{tenter=instance}
+--_mtable-regex-Coq=main/(?:Theorem|Lemma|Fact|Remark|Corollary|Proposition|Property)\b//{pcre2}{tenter=theorem}
+--_mtable-regex-Coq=main/(?:Inductive|CoInductive|Variant)\b//{pcre2}{tenter=inductive}
+--_mtable-regex-Coq=main/Canonical(?:\s+Structure)?\b//{pcre2}{tenter=canonical}
+--_mtable-regex-Coq=main/(?:Record|Structure|Class)\b//{pcre2}{tenter=record}
+--_mtable-regex-Coq=main/Ltac\b//{pcre2}{tenter=ltac}
+--_mtable-regex-Coq=main/\w+//{pcre2}
 --_mtable-regex-Coq=main/.//
 
 
 # Definition https://coq.inria.fr/refman/language/core/definitions.html#coq:cmd.Definition
 --_mtable-extend-Coq=definition+skip
---_mtable-regex-Coq=definition/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{tjump=skipToNextSentence}
+--_mtable-regex-Coq=definition/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{pcre2}{tjump=skipToNextSentence}
 
 
 # Fixpoint https://coq.inria.fr/refman/language/core/inductive.html#coq:cmd.Fixpoint
 # TODO: with
 --_mtable-extend-Coq=fixpoint+skip
---_mtable-regex-Coq=fixpoint/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{tjump=skipToNextSentence}
+--_mtable-regex-Coq=fixpoint/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{pcre2}{tjump=skipToNextSentence}
 
 # Instance https://coq.inria.fr/refman/addendum/type-classes.html#coq:cmd.Instance
 --_mtable-extend-Coq=instance+skip
---_mtable-regex-Coq=instance/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{tjump=skipToNextSentence}
+--_mtable-regex-Coq=instance/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{pcre2}{tjump=skipToNextSentence}
 # anonymouse instance
---_mtable-regex-Coq=instance/.//{tjump=skipToNextSentence}
+--_mtable-regex-Coq=instance/.//{pcre2}{tjump=skipToNextSentence}
 
 
 # Theorem https://coq.inria.fr/refman/language/core/definitions.html#coq:cmd.Theorem
 # TODO: with
 --_mtable-extend-Coq=theorem+skip
---_mtable-regex-Coq=theorem/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/t/{tjump=skipToNextSentence}
+--_mtable-regex-Coq=theorem/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/t/{pcre2}{tjump=skipToNextSentence}
 
 
 # Inductive https://coq.inria.fr/refman/language/core/inductive.html#coq:cmd.Inductive
@@ -173,41 +171,41 @@
 
 --_mtable-extend-Coq=inductive+skip
 --_mtable-regex-Coq=inductive/>//
---_mtable-regex-Coq=inductive/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/i/{tjump=skipToConstructors}
+--_mtable-regex-Coq=inductive/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/i/{pcre2}{tjump=skipToConstructors}
 
 # skip binders/terms until :=
 --_mtable-extend-Coq=skipToConstructors+skip
 --_mtable-extend-Coq=skipToConstructors+skipTerm
---_mtable-regex-Coq=skipToConstructors/:=//{tjump=constructor}
+--_mtable-regex-Coq=skipToConstructors/:=//{pcre2}{tjump=constructor}
 # := can be missing
---_mtable-regex-Coq=skipToConstructors/\.[ \t\n]//{tleave}
---_mtable-regex-Coq=skipToConstructors/.//
+--_mtable-regex-Coq=skipToConstructors/\.\s//{pcre2}{tleave}
+--_mtable-regex-Coq=skipToConstructors/.//{pcre2}
 
 --_mtable-extend-Coq=constructor+skip
---_mtable-regex-Coq=constructor/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/c/{tjump=skipConstructorRest}
+--_mtable-regex-Coq=constructor/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/c/{pcre2}{tjump=skipConstructorRest}
 # skip the optional initial `|`
---_mtable-regex-Coq=constructor/\|//
+--_mtable-regex-Coq=constructor/\|//{pcre2}
 # no constructor
---_mtable-regex-Coq=constructor/\.[ \t\n]//{tleave}
+--_mtable-regex-Coq=constructor/\.\s//{pcre2}{tleave}
 --_mtable-regex-Coq=constructor/.//
 
 --_mtable-extend-Coq=skipConstructorRest+skipTerm
 # next constructor
---_mtable-regex-Coq=skipConstructorRest/\|//{tjump=constructor}
+--_mtable-regex-Coq=skipConstructorRest/\|//{pcre2}{tjump=constructor}
 # end of Inductive
---_mtable-regex-Coq=skipConstructorRest/\.[ \t\n]//{tleave}
+--_mtable-regex-Coq=skipConstructorRest/\.\s//{pcre2}{tleave}
 # mutually recursive
---_mtable-regex-Coq=skipConstructorRest/with[]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]//{tjump=inductive}
---_mtable-regex-Coq=skipConstructorRest/[[:alnum:]_]+//
+--_mtable-regex-Coq=skipConstructorRest/with\b//{pcre2}{tjump=inductive}
+--_mtable-regex-Coq=skipConstructorRest/\w+//{pcre2}
 --_mtable-regex-Coq=skipConstructorRest/.//
 
 
 # Canonical structure https://coq.inria.fr/refman/language/extensions/canonical.html#coq:cmd.Canonical-Structure
 --_mtable-extend-Coq=canonical+skip
 # reference: just skip. TODO: reference https://coq.inria.fr/refman/proof-engine/vernacular-commands.html#grammar-token-reference
---_mtable-regex-Coq=canonical/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)[ \t\n]*\.[ \t\n]//{tleave}
+--_mtable-regex-Coq=canonical/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)\s*\.\s//{pcre2}{tleave}
 # definition
---_mtable-regex-Coq=canonical/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{tjump=skipToNextSentence}
+--_mtable-regex-Coq=canonical/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{pcre2}{tjump=skipToNextSentence}
 
 
 # Record https://coq.inria.fr/refman/language/core/records.html#coq:cmd.Record
@@ -220,44 +218,44 @@
 
 --_mtable-extend-Coq=record+skip
 --_mtable-regex-Coq=record/>//
---_mtable-regex-Coq=record/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/r/{tjump=skipToRecordConstructor}
+--_mtable-regex-Coq=record/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/r/{pcre2}{tjump=skipToRecordConstructor}
 
 # skip binders/terms until :=
 --_mtable-extend-Coq=skipToRecordConstructor+skip
 --_mtable-extend-Coq=skipToRecordConstructor+skipEnclosed
---_mtable-regex-Coq=skipToRecordConstructor/:=//{tjump=recordConstructor}
+--_mtable-regex-Coq=skipToRecordConstructor/:=//{pcre2}{tjump=recordConstructor}
 # := can be missing
---_mtable-regex-Coq=skipToRecordConstructor/\.[ \t\n]//{tleave}
---_mtable-regex-Coq=skipToRecordConstructor/.//
+--_mtable-regex-Coq=skipToRecordConstructor/\.\s//{pcre2}{tleave}
+--_mtable-regex-Coq=skipToRecordConstructor/.//{pcre2}
 
 --_mtable-extend-Coq=recordConstructor+skip
 # explicit constructor
---_mtable-regex-Coq=recordConstructor/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)[ \t\n]*\{/\1/c/{tjump=recordField}
+--_mtable-regex-Coq=recordConstructor/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)\s*\{/\1/c/{pcre2}{tjump=recordField}
 # TODO: implicit constructor must use optscript to get the record name https://github.com/universal-ctags/ctags/commit/bd186360d320c31e9777827dbdda155fdc5641bf
---_mtable-regex-Coq=recordConstructor/\{//{tjump=recordField}
+--_mtable-regex-Coq=recordConstructor/\{//{pcre2}{tjump=recordField}
 
 --_mtable-extend-Coq=recordField+skip
 # skip attributes
 --_mtable-extend-Coq=recordField+skipEnclosed
---_mtable-regex-Coq=recordField/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/f/{tjump=skipRecordFieldRest}
+--_mtable-regex-Coq=recordField/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/f/{pcre2}{tjump=skipRecordFieldRest}
 # no field
 # TODO must `skip` at the end of the record
---_mtable-regex-Coq=recordField/\}\.[ \t\n]//{tleave}
+--_mtable-regex-Coq=recordField/\}\.\s//{pcre2}{tleave}
 --_mtable-regex-Coq=recordField/.//
 
 --_mtable-extend-Coq=skipRecordFieldRest+skip
 --_mtable-extend-Coq=skipRecordFieldRest+skipEnclosed
 # next field
 # NOTE: not perfect since notation can contain `;`
---_mtable-regex-Coq=skipRecordFieldRest/;//{tjump=recordField}
+--_mtable-regex-Coq=skipRecordFieldRest/;//{pcre2}{tjump=recordField}
 # end of record
---_mtable-regex-Coq=skipRecordFieldRest/\}\.[ \t\n]//{tleave}
---_mtable-regex-Coq=skipRecordFieldRest/.//
+--_mtable-regex-Coq=skipRecordFieldRest/\}\.\s//{pcre2}{tleave}
+--_mtable-regex-Coq=skipRecordFieldRest/.//{pcre2}
 
 
 # Ltac https://coq.inria.fr/refman/proof-engine/ltac.html#coq:cmd.Ltac
 --_mtable-extend-Coq=ltac+skip
---_mtable-regex-Coq=ltac/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/l/{tjump=skipToNextSentence}
+--_mtable-regex-Coq=ltac/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/l/{pcre2}{tjump=skipToNextSentence}
 
 
 # vim:set ft=conf:
