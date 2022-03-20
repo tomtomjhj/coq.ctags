@@ -218,8 +218,9 @@
 # TODO: implicit constructor must use optscript to get the record name https://github.com/universal-ctags/ctags/commit/bd186360d320c31e9777827dbdda155fdc5641bf
 --_mtable-regex-Coq=recordConstructor/\{//{pcre2}{tjump=recordField}
 
-# TODO: skip attributes
 --_mtable-extend-Coq=recordField+skip
+# skip attributes
+--_mtable-extend-Coq=recordField+skipEnclosed
 --_mtable-regex-Coq=recordField/((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\1/f/{pcre2}{tjump=skipRecordFieldRest}
 # no field
 --_mtable-regex-Coq=recordField/\}\.\s//{pcre2}{tleave}
