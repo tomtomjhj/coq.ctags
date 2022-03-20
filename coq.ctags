@@ -32,6 +32,7 @@
 --_tabledef-Coq=instance
 --_tabledef-Coq=theorem
 --_tabledef-Coq=inductive
+--_tabledef-Coq=canonical
 --_tabledef-Coq=record
 --_tabledef-Coq=ltac
 
@@ -124,8 +125,7 @@
 --_mtable-regex-Coq=main/Instance\b//{pcre2}{tenter=instance}
 --_mtable-regex-Coq=main/(?:Theorem|Lemma|Fact|Remark|Corollary|Proposition|Property)\b//{pcre2}{tenter=theorem}
 --_mtable-regex-Coq=main/(?:Inductive|CoInductive|Variant)\b//{pcre2}{tenter=inductive}
-# TODO: canonical structure (only the form with :=) https://coq.inria.fr/refman/language/extensions/canonical.html#coq:cmd.Canonical-Structure
---_mtable-regex-Coq=main/Canonical\s+Structure\b//{pcre2}{tenter=skipToNextSentence}
+--_mtable-regex-Coq=main/Canonical(?:\s+Structure)?\b//{pcre2}{tenter=canonical}
 --_mtable-regex-Coq=main/(?:Record|Structure|Class)\b//{pcre2}{tenter=record}
 --_mtable-regex-Coq=main/Ltac\b//{pcre2}{tenter=ltac}
 --_mtable-regex-Coq=main/\w+//{pcre2}
@@ -190,6 +190,14 @@
 --_mtable-regex-Coq=skipConstructorRest/with\b//{pcre2}{tjump=inductive}
 --_mtable-regex-Coq=skipConstructorRest/\w+//{pcre2}
 --_mtable-regex-Coq=skipConstructorRest/.//
+
+
+# Canonical structure https://coq.inria.fr/refman/language/extensions/canonical.html#coq:cmd.Canonical-Structure
+--_mtable-extend-Coq=canonical+skip
+# reference: just skip. TODO: reference https://coq.inria.fr/refman/proof-engine/vernacular-commands.html#grammar-token-reference
+--_mtable-regex-Coq=canonical/((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)\s*\.\s//{pcre2}{tleave}
+# definition
+--_mtable-regex-Coq=canonical/((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*)/\1/d/{pcre2}{tjump=skipToNextSentence}
 
 
 # Record https://coq.inria.fr/refman/language/core/records.html#coq:cmd.Record
