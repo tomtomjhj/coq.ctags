@@ -1,0 +1,134 @@
+--langdef=Coq
+--map-Coq=+.v
+
+--kinddef-Coq=d,definition,IsDefinition
+--kinddef-Coq=a,assumption,IsAssumption
+--kinddef-Coq=t,theorem,IsProof
+--kinddef-Coq=i,inductive,Inductive
+--kinddef-Coq=c,constructor,Constructor
+--kinddef-Coq=r,record,Record/Class
+--kinddef-Coq=f,field,Field
+--kinddef-Coq=l,ltac,Ltac
+
+# TODO:
+# - all table should jump to comment
+# - all table must have /./
+--_tabledef-Coq=toplevel
+--_tabledef-Coq=record
+--_tabledef-Coq=fields
+--_tabledef-Coq=comment
+
+--_tabledef-Coq=paren
+--_tabledef-Coq=brace
+--_tabledef-Coq=bracket
+# NOTE to disambiguate `with` of term `match` and vernac
+--_tabledef-Coq=match
+--_tabledef-Coq=match_with
+
+# TODO: end of sentence can be eof. this shouldn't be problem for files with newline at eof
+# TODO: wrap keywords with word boundary? how? eat spaces first? → PCRE?
+# TODO: unicode identifier? → PCRE?
+#   https://github.com/rouge-ruby/rouge/pull/1764
+#
+# NOTE: [^@|({[`:[:space:]]
+#         ^^ for inductive's def
+
+# NOTE: assumes that parens/braces/brackets in terms are well-matched
+--_mtable-regex-Coq=paren/\(\*//{tenter=comment}
+--_mtable-regex-Coq=paren/\)//{tleave}
+--_mtable-regex-Coq=paren/\(//{tenter=paren}
+--_mtable-regex-Coq=paren/\{//{tenter=brace}
+--_mtable-regex-Coq=paren/\[//{tenter=bracket}
+--_mtable-regex-Coq=paren/\bmatch\b//{pcre2}{tenter=match}
+--_mtable-regex-Coq=paren/.//
+
+--_mtable-regex-Coq=brace/\(\*//{tenter=comment}
+--_mtable-regex-Coq=brace/\}//{tleave}
+--_mtable-regex-Coq=brace/\(//{tenter=paren}
+--_mtable-regex-Coq=brace/\{//{tenter=brace}
+--_mtable-regex-Coq=brace/\[//{tenter=bracket}
+--_mtable-regex-Coq=brace/\bmatch\b//{pcre2}{tenter=match}
+--_mtable-regex-Coq=brace/.//
+
+--_mtable-regex-Coq=bracket/\(\*//{tenter=comment}
+--_mtable-regex-Coq=bracket/\]//{tleave}
+--_mtable-regex-Coq=bracket/\(//{tenter=paren}
+--_mtable-regex-Coq=bracket/\{//{tenter=brace}
+--_mtable-regex-Coq=bracket/\[//{tenter=bracket}
+--_mtable-regex-Coq=bracket/\bmatch\b//{pcre2}{tenter=match}
+--_mtable-regex-Coq=bracket/.//
+
+# TODO: some bug in match
+--_mtable-regex-Coq=match/\(\*//{tenter=comment}
+--_mtable-regex-Coq=match/\bwith\b//{pcre2}{tjump=match_with}
+--_mtable-regex-Coq=match/\(//{tenter=paren}
+--_mtable-regex-Coq=match/\{//{tenter=brace}
+--_mtable-regex-Coq=match/\[//{tenter=bracket}
+--_mtable-regex-Coq=match/\bmatch\b//{pcre2}{tenter=match}
+--_mtable-regex-Coq=match/.//
+
+--_mtable-regex-Coq=match_with/\(\*//{tenter=comment}
+--_mtable-regex-Coq=match_with/\bend\b//{pcre2}{tleave}
+--_mtable-regex-Coq=match_with/\(//{tenter=paren}
+--_mtable-regex-Coq=match_with/\{//{tenter=brace}
+--_mtable-regex-Coq=match_with/\[//{tenter=bracket}
+--_mtable-regex-Coq=match_with/\bmatch\b//{pcre2}{tenter=match}
+--_mtable-regex-Coq=match_with/.//
+
+
+--_mtable-regex-Coq=toplevel/\(\*//{tenter=comment}
+# TODO: with
+--_mtable-regex-Coq=toplevel/(Definition|Example)[[:space:]]+([^({[`:[:space:]]+)/\2/d/
+--_mtable-regex-Coq=toplevel/(Fixpoint|CoFixpoint)[[:space:]]+([^({[`:[:space:]]+)/\2/d/
+--_mtable-regex-Coq=toplevel/Instance[[:space:]]+([^({[`:[:space:]]+)/\1/d/
+--_mtable-regex-Coq=toplevel/(Theorem|Lemma|Fact|Remark|Corollary|Proposition|Property)[[:space:]]+([^({[`:[:space:]]+)/\2/t/
+
+--_tabledef-Coq=inductive
+--_tabledef-Coq=constructors
+--_tabledef-Coq=constructor
+--_mtable-regex-Coq=toplevel/(Inductive|CoInductive|Variant)[[:space:]>]+([^@|({[`:[:space:]]+)/\2/i/{tenter=inductive}
+--_mtable-regex-Coq=inductive/\(\*//{tenter=comment}
+--_mtable-regex-Coq=inductive/\(//{tenter=paren}
+--_mtable-regex-Coq=inductive/\{//{tenter=brace}
+--_mtable-regex-Coq=inductive/\[//{tenter=bracket}
+--_mtable-regex-Coq=inductive/:=//{tjump=constructors}
+--_mtable-regex-Coq=inductive/.//
+--_mtable-regex-Coq=constructors/\(\*//{tenter=comment}
+--_mtable-regex-Coq=constructors/([[:alpha:]_][^({[`:[:space:]]*)/\1/c/{tjump=constructor}
+# skip the optional initial `|`
+--_mtable-regex-Coq=constructors/\|//
+# for Inductive with no constructor
+--_mtable-regex-Coq=constructors/\.[[:space:]]//{tleave}
+--_mtable-regex-Coq=constructors/.//
+--_mtable-regex-Coq=constructor/\(\*//{tenter=comment}
+--_mtable-regex-Coq=constructor/\(//{tenter=paren}
+--_mtable-regex-Coq=constructor/\{//{tenter=brace}
+--_mtable-regex-Coq=constructor/\[//{tenter=bracket}
+# --_mtable-regex-Coq=constructor/\bmatch\b//{pcre2}{tenter=match}
+# end of the current constructor
+--_mtable-regex-Coq=constructor/\|//{tjump=constructors}
+# end of Inductive
+--_mtable-regex-Coq=constructor/\.[[:space:]]//{tleave}
+--_mtable-regex-Coq=constructor/\bwith\b[[:space:]>]+([^@|({[`:[:space:]]+)/\1/i/{tenter=inductive}//{pcre2}{tleave}
+--_mtable-regex-Coq=constructor/.//
+
+# --_mtable-regex-Coq=toplevel/(Record|Structure|Class)[[:space:]>]+([^@|({[`:[:space:]]+)/\2/r/
+# TODO record: constructor
+# TODO record: fields
+# TODO record: singleton
+--_mtable-regex-Coq=toplevel/(Record|Structure|Class)[[:space:]>]+([^@|({[`:[:space:]]+)/\2/r/{tenter=record}
+# TODO: this generates a lot of weird stuff.. should match braces...
+# --_mtable-regex-Coq=record/[{;][[:space:]]*([[:alpha:]_][^@|({[`:[:space:]]*)[^:]*:/\1/f/
+--_mtable-regex-Coq=record/}[[:space:]]*\.//{tleave}
+--_mtable-regex-Coq=record/.//
+
+--_mtable-regex-Coq=toplevel/Ltac[[:space:]]+([^:[:space:]]+)/\1/l/
+--_mtable-regex-Coq=toplevel/.//
+
+# allow nested comment
+--_mtable-regex-Coq=comment/\(\*//{tenter=comment}
+--_mtable-regex-Coq=comment/\*\)//{tleave}
+--_mtable-regex-Coq=comment/.//
+
+
+# vim:set ft=conf:
