@@ -2,9 +2,10 @@
 #
 # NOTE: end of sentence can be eof. this shouldn't be problem for files with newline at eof
 #
-# NOTE(word boundary): (pcre2) \b at the beginning of the pattern since we're
-# always at the start of string. So instead, eat any non-keyword word, so that
-# the start position is always at the start of a word.
+# NOTE(word boundary): (pcre2) \b at the beginning of the pattern is not
+# meaningful since we're always at the start of string. So instead, eat any
+# non-keyword word, so that the start position is always at the start of a
+# word.
 # Word end can be emulated with POSIX ERE
 #     []!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^] ([:punct:] without ' and _),
 # but this consumes the char, so breaks things like `(match ... end)`.
@@ -13,7 +14,7 @@
 # NOTE(unicode identifier): ((?:\p{L}|_)(?:\p{L}|\p{N}|_|')*) https://github.com/rouge-ruby/rouge/pull/1764
 # TODO: This doesn't work! Example: `Inductive εμπτη :=.` ⇒ [ILLEGAL BYTE in line XXX]. Bug?
 # Alternative: [^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*
-#              (       first letter                       )(        sebsequent letters                )
+#              (       first letter                       )(        subsequent letters                )
 # - based on [:punct:]
 # - https://www.regular-expressions.info/posixbrackets.html
 #   - To match a ], put it as the first character after the opening [ or the negating ^.
@@ -166,7 +167,7 @@
 # Inductive {{{
 # https://coq.inria.fr/refman/language/core/inductive.html#coq:cmd.Inductive
 # TODO: constructors_or_record
-# TODO: _ind, ...
+# TODO: _ind, ... Use scope + optscript.
 --_tabledef-Coq=skipToConstructors
 --_tabledef-Coq=constructor
 --_tabledef-Coq=skipConstructorRest
