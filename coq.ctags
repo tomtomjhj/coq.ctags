@@ -41,20 +41,20 @@
 # Comment {{{
 --_tabledef-Coq=comment
 # allow nested comment
---_mtable-regex-Coq=comment/\(\*//{tenter=comment}
---_mtable-regex-Coq=comment/\*\)//{tleave}
---_mtable-regex-Coq=comment/.//
+--_mtable-regex-Coq=comment/\(\*//{pcre2}{tenter=comment}
+--_mtable-regex-Coq=comment/\*\)//{pcre2}{tleave}
+--_mtable-regex-Coq=comment/.//{pcre2}
 
 --_tabledef-Coq=skipComment
---_mtable-regex-Coq=skipComment/\(\*//{tenter=comment}
+--_mtable-regex-Coq=skipComment/\(\*//{pcre2}{tenter=comment}
 # }}}
 
 # String {{{
 # https://coq.inria.fr/refman/language/core/basic.html#grammar-token-string
 --_tabledef-Coq=string
---_mtable-regex-Coq=string/""//
---_mtable-regex-Coq=string/"//{tleave}
---_mtable-regex-Coq=string/.//
+--_mtable-regex-Coq=string/""//{pcre2}
+--_mtable-regex-Coq=string/"//{pcre2}{tleave}
+--_mtable-regex-Coq=string/.//{pcre2}
 
 --_tabledef-Coq=skipString
 --_mtable-regex-Coq=skipString/"//{pcre2}{tenter=string}
@@ -72,7 +72,7 @@
 --_tabledef-Coq=skipToNextSentence
 --_mtable-extend-Coq=skipToNextSentence+skipString
 --_mtable-regex-Coq=skipToNextSentence/\.\s//{pcre2}{tleave}
---_mtable-regex-Coq=skipToNextSentence/.//
+--_mtable-regex-Coq=skipToNextSentence/.//{pcre2}
 # }}}
 
 # Term and Binder {{{
@@ -93,26 +93,26 @@
 --_mtable-extend-Coq=paren+skipComment
 --_mtable-extend-Coq=paren+skipEnclosed
 --_mtable-extend-Coq=paren+skipString
---_mtable-regex-Coq=paren/\)//{tleave}
+--_mtable-regex-Coq=paren/\)//{pcre2}{tleave}
 --_mtable-regex-Coq=paren/match\b//{pcre2}{tenter=match}
 --_mtable-regex-Coq=paren/\w+//{pcre2}
---_mtable-regex-Coq=paren/.//
+--_mtable-regex-Coq=paren/.//{pcre2}
 
 --_mtable-extend-Coq=brace+skipComment
 --_mtable-extend-Coq=brace+skipEnclosed
 --_mtable-extend-Coq=brace+skipString
---_mtable-regex-Coq=brace/\}//{tleave}
+--_mtable-regex-Coq=brace/\}//{pcre2}{tleave}
 --_mtable-regex-Coq=brace/match\b//{pcre2}{tenter=match}
 --_mtable-regex-Coq=brace/\w+//{pcre2}
---_mtable-regex-Coq=brace/.//
+--_mtable-regex-Coq=brace/.//{pcre2}
 
 --_mtable-extend-Coq=bracket+skipComment
 --_mtable-extend-Coq=bracket+skipEnclosed
 --_mtable-extend-Coq=bracket+skipString
---_mtable-regex-Coq=bracket/\]//{tleave}
+--_mtable-regex-Coq=bracket/\]//{pcre2}{tleave}
 --_mtable-regex-Coq=bracket/match\b//{pcre2}{tenter=match}
 --_mtable-regex-Coq=bracket/\w+//{pcre2}
---_mtable-regex-Coq=bracket/.//
+--_mtable-regex-Coq=bracket/.//{pcre2}
 
 --_mtable-extend-Coq=match+skipComment
 --_mtable-extend-Coq=bracket+skipEnclosed
@@ -120,7 +120,7 @@
 --_mtable-regex-Coq=match/end\b//{pcre2}{tleave}
 --_mtable-regex-Coq=match/match\b//{pcre2}{tenter=match}
 --_mtable-regex-Coq=match/\w+//{pcre2}
---_mtable-regex-Coq=match/.//
+--_mtable-regex-Coq=match/.//{pcre2}
 
 --_mtable-extend-Coq=skipTerm+skipEnclosed
 --_mtable-extend-Coq=skipTerm+skipString
@@ -149,7 +149,7 @@
 --_mtable-regex-Coq=main/(?:Record|Structure|Class)\b//{pcre2}{tenter=record}
 --_mtable-regex-Coq=main/Ltac\b//{pcre2}{tenter=ltac}
 --_mtable-regex-Coq=main/\w+//{pcre2}
---_mtable-regex-Coq=main/.//
+--_mtable-regex-Coq=main/.//{pcre2}
 # }}}
 
 # Definition {{{
@@ -189,7 +189,7 @@
 --_tabledef-Coq=skipConstructorRest
 
 --_mtable-extend-Coq=inductive+skip
---_mtable-regex-Coq=inductive/>//
+--_mtable-regex-Coq=inductive/>//{pcre2}
 --_mtable-regex-Coq=inductive/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/i/{pcre2}{tjump=skipToConstructors}
 
 # skip binders/terms until :=
@@ -206,7 +206,7 @@
 --_mtable-regex-Coq=constructor/\|//{pcre2}
 # no constructor
 --_mtable-regex-Coq=constructor/\.\s//{pcre2}{tleave}
---_mtable-regex-Coq=constructor/.//
+--_mtable-regex-Coq=constructor/.//{pcre2}
 
 --_mtable-extend-Coq=skipConstructorRest+skipTerm
 # next constructor
@@ -216,7 +216,7 @@
 # mutually recursive
 --_mtable-regex-Coq=skipConstructorRest/with\b//{pcre2}{tjump=inductive}
 --_mtable-regex-Coq=skipConstructorRest/\w+//{pcre2}
---_mtable-regex-Coq=skipConstructorRest/.//
+--_mtable-regex-Coq=skipConstructorRest/.//{pcre2}
 # }}}
 
 # Canonical Structure {{{
@@ -238,7 +238,7 @@
 --_tabledef-Coq=skipRecordFieldRest
 
 --_mtable-extend-Coq=record+skip
---_mtable-regex-Coq=record/>//
+--_mtable-regex-Coq=record/>//{pcre2}
 --_mtable-regex-Coq=record/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/r/{pcre2}{tjump=skipToRecordConstructor}
 
 # skip binders/terms until :=
@@ -261,7 +261,7 @@
 --_mtable-regex-Coq=recordField/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/f/{pcre2}{tjump=skipRecordFieldRest}
 # no field
 --_mtable-regex-Coq=recordField/\}//{pcre2}{tjump=skipToNextSentence}
---_mtable-regex-Coq=recordField/.//
+--_mtable-regex-Coq=recordField/.//{pcre2}
 
 --_mtable-extend-Coq=skipRecordFieldRest+skip
 --_mtable-extend-Coq=skipRecordFieldRest+skipEnclosed
