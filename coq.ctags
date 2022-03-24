@@ -49,17 +49,28 @@
 --_mtable-regex-Coq=skipComment/\(\*//{tenter=comment}
 # }}}
 
-# Utils {{{
-# TODO: string https://coq.inria.fr/refman/language/core/basic.html#grammar-token-string
---_tabledef-Coq=skipWhiteSpace
---_tabledef-Coq=skip
+# String {{{
+# https://coq.inria.fr/refman/language/core/basic.html#grammar-token-string
+--_tabledef-Coq=string
+--_mtable-regex-Coq=string/""//
+--_mtable-regex-Coq=string/"//{tleave}
+--_mtable-regex-Coq=string/.//
 
+--_tabledef-Coq=skipString
+--_mtable-regex-Coq=skipString/"//{pcre2}{tenter=string}
+# }}}
+
+# Utils {{{
+--_tabledef-Coq=skipWhiteSpace
 --_mtable-regex-Coq=skipWhiteSpace/\s+//{pcre2}
 
+# TODO: rename to skipBlank
+--_tabledef-Coq=skip
 --_mtable-extend-Coq=skip+skipWhiteSpace
 --_mtable-extend-Coq=skip+skipComment
 
 --_tabledef-Coq=skipToNextSentence
+--_mtable-extend-Coq=skipToNextSentence+skipString
 --_mtable-regex-Coq=skipToNextSentence/\.\s//{pcre2}{tleave}
 --_mtable-regex-Coq=skipToNextSentence/.//
 # }}}
@@ -81,6 +92,7 @@
 
 --_mtable-extend-Coq=paren+skipComment
 --_mtable-extend-Coq=paren+skipEnclosed
+--_mtable-extend-Coq=paren+skipString
 --_mtable-regex-Coq=paren/\)//{tleave}
 --_mtable-regex-Coq=paren/match\b//{pcre2}{tenter=match}
 --_mtable-regex-Coq=paren/\w+//{pcre2}
@@ -88,6 +100,7 @@
 
 --_mtable-extend-Coq=brace+skipComment
 --_mtable-extend-Coq=brace+skipEnclosed
+--_mtable-extend-Coq=brace+skipString
 --_mtable-regex-Coq=brace/\}//{tleave}
 --_mtable-regex-Coq=brace/match\b//{pcre2}{tenter=match}
 --_mtable-regex-Coq=brace/\w+//{pcre2}
@@ -95,6 +108,7 @@
 
 --_mtable-extend-Coq=bracket+skipComment
 --_mtable-extend-Coq=bracket+skipEnclosed
+--_mtable-extend-Coq=bracket+skipString
 --_mtable-regex-Coq=bracket/\]//{tleave}
 --_mtable-regex-Coq=bracket/match\b//{pcre2}{tenter=match}
 --_mtable-regex-Coq=bracket/\w+//{pcre2}
@@ -102,12 +116,14 @@
 
 --_mtable-extend-Coq=match+skipComment
 --_mtable-extend-Coq=bracket+skipEnclosed
+--_mtable-extend-Coq=match+skipString
 --_mtable-regex-Coq=match/end\b//{pcre2}{tleave}
 --_mtable-regex-Coq=match/match\b//{pcre2}{tenter=match}
 --_mtable-regex-Coq=match/\w+//{pcre2}
 --_mtable-regex-Coq=match/.//
 
 --_mtable-extend-Coq=skipTerm+skipEnclosed
+--_mtable-extend-Coq=skipTerm+skipString
 # NOTE: see word boundary note
 --_mtable-regex-Coq=skipTerm/match\b//{pcre2}{tenter=match}
 # }}}
