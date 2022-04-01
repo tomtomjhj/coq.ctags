@@ -223,7 +223,6 @@
 
 # Record {{{
 # https://coq.inria.fr/refman/language/core/records.html#coq:cmd.Record
-# TODO: singleton_class_definition  https://coq.inria.fr/refman/addendum/type-classes.html#coq:cmd.Class
 # TODO `with`
 --_tabledef-Coq=skipToRecordConstructor
 --_tabledef-Coq=recordConstructor
@@ -247,6 +246,9 @@
 --_mtable-regex-Coq=recordConstructor/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)\s*\{/\1/c/{pcre2}{tjump=recordField}
 # TODO: implicit constructor. Use scope and optscript to get the record name https://github.com/universal-ctags/ctags/commit/bd186360d320c31e9777827dbdda155fdc5641bf
 --_mtable-regex-Coq=recordConstructor/\{//{pcre2}{tjump=recordField}
+# singleton_class_definition https://coq.inria.fr/refman/addendum/type-classes.html#coq:cmd.Class
+# NOTE: Record constructor has higher priority than singleton_class_definition method with {} implicit binders.
+--_mtable-regex-Coq=recordConstructor/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/f/{pcre2}{tjump=skipToNextSentence}
 
 --_mtable-extend-Coq=recordField+skip
 # skip attributes
