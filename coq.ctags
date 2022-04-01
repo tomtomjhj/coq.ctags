@@ -145,9 +145,17 @@
 
 # Fixpoint {{{
 # https://coq.inria.fr/refman/language/core/inductive.html#coq:cmd.Fixpoint
-# TODO: with
+--_tabledef-Coq=skipFixpointRest
 --_mtable-extend-Coq=fixpoint+skip
---_mtable-regex-Coq=fixpoint/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{pcre2}{tjump=skipToNextSentence}
+--_mtable-regex-Coq=fixpoint/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{pcre2}{tjump=skipFixpointRest}
+
+--_mtable-extend-Coq=skipFixpointRest+skip
+--_mtable-extend-Coq=skipFixpointRest+trySkipEnclosed
+# mutually recursive
+--_mtable-regex-Coq=skipFixpointRest/with\b//{pcre2}{tjump=fixpoint}
+# end of Fixpoint
+--_mtable-regex-Coq=skipFixpointRest/\.\s//{pcre2}{tleave}
+--_mtable-extend-Coq=skipFixpointRest+advance
 # }}}
 
 # Instance {{{
