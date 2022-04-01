@@ -8,12 +8,11 @@
 
 ### Not supported (yet)
 * `Axiom`, `Conjecture`, `Parameter`, `Hypothesis`, `Variable`
-* `Theorem ... with`, `Fixpoint ... with`, `Record ... with` (`Inductive ... with` is supported)
+* `Theorem ... with`, `Record ... with` (`Inductive ... with` and `Fixpoint ... with` are supported)
 * Automatically generated identifiers
     * `Build_XXX`
     * `XXX_ind`, ...
 * [`constructors_or_record`](https://coq.inria.fr/refman/language/core/inductive.html#grammar-token-constructors_or_record)
-* [`singleton_class_definition`](https://coq.inria.fr/refman/addendum/type-classes.html#grammar-token-singleton_class_definition)
 * Notations
     * [basic notation](https://coq.inria.fr/refman/user-extensions/syntax-extensions.html#coq:cmd.Notation)
     * [abbreviation](https://coq.inria.fr/refman/user-extensions/syntax-extensions.html#coq:cmd.Notation-(abbreviation))

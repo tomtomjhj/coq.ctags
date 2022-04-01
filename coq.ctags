@@ -33,7 +33,7 @@
 --kinddef-Coq=t,theorem,Theorem/Lemma/Fact/Remark/Corollary/Proposition/Property
 --kinddef-Coq=i,inductive,Inductive/Coinductive/Variant
 --kinddef-Coq=c,constructor,Inductive/Coinductive/Variant/Record constructor
---kinddef-Coq=r,record,Record/Class
+--kinddef-Coq=r,record,Record/Structure/Class
 --kinddef-Coq=f,field,Record field, Class method
 --kinddef-Coq=l,ltac,Ltac
 
@@ -132,6 +132,7 @@
 --_mtable-regex-Coq=main/(?:Theorem|Lemma|Fact|Remark|Corollary|Proposition|Property)\b//{pcre2}{tenter=theorem}
 --_mtable-regex-Coq=main/(?:Inductive|CoInductive|Variant)\b//{pcre2}{tenter=inductive}
 --_mtable-regex-Coq=main/Canonical(?:\s+Structure)?\b//{pcre2}{tenter=canonical}
+--_mtable-regex-Coq=main/Existing\s+Class\b//{pcre2}{tenter=skipToNextSentence}
 --_mtable-regex-Coq=main/(?:Record|Structure|Class)\b//{pcre2}{tenter=record}
 --_mtable-regex-Coq=main/Ltac\b//{pcre2}{tenter=ltac}
 --_mtable-extend-Coq=main+advance

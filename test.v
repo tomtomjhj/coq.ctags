@@ -1,6 +1,6 @@
 From Coq Require Import Strings.String.
 
-Inductive εμπτγ :=.
+Inductive εμπτη :=.
 
 Definition stringly_typed : string := ". Inductive nope :=. """.
 
@@ -30,7 +30,7 @@ with inductive_with_match2 (a : match True with _ => True end) :=
   | inductive_with_match2_ctor2 : (match "end"%string with _ => True end) -> inductive_with_match2 a
   .
 
-Ltac lazy_tac :=
+#[local] Ltac lazy_tac :=
   lazymatch goal with
   | |- _ => idtac (* match *)
   end.
