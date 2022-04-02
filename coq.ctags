@@ -184,22 +184,22 @@
 
 --_mtable-extend-Coq=inductive+skip
 --_mtable-regex-Coq=inductive/>//{pcre2}
---_mtable-regex-Coq=inductive/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/i/{pcre2}{tjump=skipToConstructors}
+--_mtable-regex-Coq=inductive/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/i/{pcre2}{tjump=skipToConstructors}{scope=push}
 
 # skip binders/terms until :=
 --_mtable-extend-Coq=skipToConstructors+skip
 --_mtable-extend-Coq=skipToConstructors+trySkipEnclosed
 --_mtable-regex-Coq=skipToConstructors/:=//{pcre2}{tjump=constructor}
 # := can be missing
---_mtable-regex-Coq=skipToConstructors/\.\s//{pcre2}{tleave}
+--_mtable-regex-Coq=skipToConstructors/\.\s//{pcre2}{tleave}{scope=pop}
 --_mtable-extend-Coq=skipToConstructors+advance
 
 --_mtable-extend-Coq=constructor+skip
---_mtable-regex-Coq=constructor/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/c/{pcre2}{tjump=skipConstructorRest}
+--_mtable-regex-Coq=constructor/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/c/{pcre2}{tjump=skipConstructorRest}{scope=ref}
 # skip the optional initial `|`
 --_mtable-regex-Coq=constructor/\|//{pcre2}
 # no constructor
---_mtable-regex-Coq=constructor/\.\s//{pcre2}{tleave}
+--_mtable-regex-Coq=constructor/\.\s//{pcre2}{tleave}{scope=pop}
 --_mtable-extend-Coq=constructor+advance
 
 --_mtable-extend-Coq=skipConstructorRest+skip
@@ -207,9 +207,9 @@
 # next constructor
 --_mtable-regex-Coq=skipConstructorRest/\|//{pcre2}{tjump=constructor}
 # end of Inductive
---_mtable-regex-Coq=skipConstructorRest/\.\s//{pcre2}{tleave}
+--_mtable-regex-Coq=skipConstructorRest/\.\s//{pcre2}{tleave}{scope=pop}
 # mutually recursive
---_mtable-regex-Coq=skipConstructorRest/with\b//{pcre2}{tjump=inductive}
+--_mtable-regex-Coq=skipConstructorRest/with\b//{pcre2}{tjump=inductive}{scope=replace}
 --_mtable-extend-Coq=skipConstructorRest+advance
 # }}}
 
@@ -232,31 +232,31 @@
 
 --_mtable-extend-Coq=record+skip
 --_mtable-regex-Coq=record/>//{pcre2}
---_mtable-regex-Coq=record/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/r/{pcre2}{tjump=skipToRecordConstructor}
+--_mtable-regex-Coq=record/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/r/{pcre2}{tjump=skipToRecordConstructor}{scope=push}
 
 # skip binders/terms until :=
 --_mtable-extend-Coq=skipToRecordConstructor+skip
 --_mtable-extend-Coq=skipToRecordConstructor+trySkipEnclosed
 --_mtable-regex-Coq=skipToRecordConstructor/:=//{pcre2}{tjump=recordConstructor}
 # := can be missing
---_mtable-regex-Coq=skipToRecordConstructor/\.\s//{pcre2}{tleave}
+--_mtable-regex-Coq=skipToRecordConstructor/\.\s//{pcre2}{tleave}{scope=pop}
 --_mtable-extend-Coq=skipToRecordConstructor+advance
 
 --_mtable-extend-Coq=recordConstructor+skip
 # explicit constructor
---_mtable-regex-Coq=recordConstructor/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)\s*\{/\1/c/{pcre2}{tjump=recordField}
+--_mtable-regex-Coq=recordConstructor/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)\s*\{/\1/c/{pcre2}{tjump=recordField}{scope=ref}
 # TODO: implicit constructor. Use scope and optscript to get the record name https://github.com/universal-ctags/ctags/commit/bd186360d320c31e9777827dbdda155fdc5641bf
 --_mtable-regex-Coq=recordConstructor/\{//{pcre2}{tjump=recordField}
 # singleton_class_definition https://coq.inria.fr/refman/addendum/type-classes.html#coq:cmd.Class
 # NOTE: Record constructor has higher priority than singleton_class_definition method with {} implicit binders.
---_mtable-regex-Coq=recordConstructor/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/f/{pcre2}{tjump=skipToNextSentence}
+--_mtable-regex-Coq=recordConstructor/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/f/{pcre2}{tjump=skipToNextSentence}{scope=ref}{scope=pop}
 
 --_mtable-extend-Coq=recordField+skip
 # skip attributes
 --_mtable-extend-Coq=recordField+trySkipEnclosed
---_mtable-regex-Coq=recordField/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/f/{pcre2}{tjump=skipRecordFieldRest}
+--_mtable-regex-Coq=recordField/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/f/{pcre2}{tjump=skipRecordFieldRest}{scope=ref}
 # no field
---_mtable-regex-Coq=recordField/\}//{pcre2}{tjump=skipToNextSentence}
+--_mtable-regex-Coq=recordField/\}//{pcre2}{tjump=skipToNextSentence}{scope=pop}
 --_mtable-extend-Coq=recordField+advance
 
 --_mtable-extend-Coq=skipRecordFieldRest+skip
@@ -265,7 +265,7 @@
 # NOTE: not perfect since notation can contain `;`
 --_mtable-regex-Coq=skipRecordFieldRest/;//{pcre2}{tjump=recordField}
 # end of record
---_mtable-regex-Coq=skipRecordFieldRest/\}//{pcre2}{tjump=skipToNextSentence}
+--_mtable-regex-Coq=skipRecordFieldRest/\}//{pcre2}{tjump=skipToNextSentence}{scope=pop}
 --_mtable-extend-Coq=skipRecordFieldRest+advance
 # }}}
 
