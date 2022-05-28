@@ -2,7 +2,7 @@
 `coq.ctags` is a [Universal Ctags][u-ctags] configuration (["optlib parser"][optlib]) for Coq.
 
 ## Features
-* Supports many built-in commands that define some identifiers.
+* Supports most built-in commands that define some identifiers.
 * Supports unicode identifiers.
 * Doesn't get confused by string, comments, attributes, etc.
 
@@ -15,8 +15,8 @@
 * [`constructors_or_record`](https://coq.inria.fr/refman/language/core/inductive.html#grammar-token-constructors_or_record)
 * Notations
     * [basic notation](https://coq.inria.fr/refman/user-extensions/syntax-extensions.html#coq:cmd.Notation)
-    * [abbreviation](https://coq.inria.fr/refman/user-extensions/syntax-extensions.html#coq:cmd.Notation-(abbreviation))
     * [tactic notation](https://coq.inria.fr/refman/user-extensions/syntax-extensions.html#coq:cmd.Tactic-Notation)
+    * (Abbreviations are supported)
 * ... ?
 
 ### Caveat
@@ -42,6 +42,7 @@ $ ctags --options=/path/to/coq.ctags [options] [file(s)]
 Some notable `[options]`:
 * `-R`: Recurse into directories
 * `-e`: Output `TAGS` file for Emacs
+* `-V`: Verbose output for debugging
 
 Please see [`ctags(1)`](https://docs.ctags.io/en/latest/man/ctags.1.html) for more details.
 
