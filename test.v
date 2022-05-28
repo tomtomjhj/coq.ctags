@@ -35,6 +35,10 @@ with inductive_with_match2 (a : match True with _ => True end) :=
   | |- _ => idtac (* match *)
   end.
 
+Notation abbrev := 1.
+Notation "'notation'" := 1 (at level 10, only parsing).
+Tactic Notation "'tactic'" := idtac.
+
 Record R := RCtor {
   #[canonical=no] R_a :> nat; (* asdf { *)
   R_b : string := "}. ";
