@@ -36,6 +36,7 @@
 --kinddef-Coq=r,record,Record/Structure/Class
 --kinddef-Coq=f,field,Record field, Class method
 --kinddef-Coq=l,ltac,Ltac
+--kinddef-Coq=a,abbreviation,Notation-(abbreviation)
 
 --_tabledef-Coq=main
 
@@ -123,6 +124,7 @@
 --_tabledef-Coq=canonical
 --_tabledef-Coq=record
 --_tabledef-Coq=ltac
+--_tabledef-Coq=notation
 
 --_mtable-extend-Coq=main+skip
 --_mtable-regex-Coq=main/(?:Definition|Example)\b//{pcre2}{tenter=definition}
@@ -135,6 +137,7 @@
 --_mtable-regex-Coq=main/Existing\s+Class\b//{pcre2}{tenter=skipToNextSentence}
 --_mtable-regex-Coq=main/(?:Record|Structure|Class)\b//{pcre2}{tenter=record}
 --_mtable-regex-Coq=main/Ltac\b//{pcre2}{tenter=ltac}
+--_mtable-regex-Coq=main/Notation\b//{pcre2}{tenter=notation}
 --_mtable-extend-Coq=main+advance
 # }}}
 
@@ -273,6 +276,14 @@
 # https://coq.inria.fr/refman/proof-engine/ltac.html#coq:cmd.Ltac
 --_mtable-extend-Coq=ltac+skip
 --_mtable-regex-Coq=ltac/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/l/{pcre2}{tjump=skipToNextSentence}
+# }}}
+
+# Notation {{{
+--_mtable-extend-Coq=notation+skip
+# abbreviation: https://coq.inria.fr/refman/user-extensions/syntax-extensions.html#coq:cmd.Notation-(abbreviation)
+--_mtable-regex-Coq=notation/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/a/{pcre2}{tjump=skipToNextSentence}
+# actual notations: ignore
+--_mtable-regex-Coq=notation/"//{pcre2}{tjump=skipToNextSentence}{_advanceTo=0start}
 # }}}
 
 # vim:set ft=conf fdm=marker:
