@@ -24,7 +24,7 @@
 * Notations that contain `;` confuses record field parsing. This results in some unwanted tag entries.
 
 ## Requirements
-A recent version of [Universal Ctags](https://github.com/universal-ctags/ctags) with `+pcre2` feature is required.
+A recent version of [Universal Ctags][u-ctags] with `+pcre2` feature is required.
 
 ```console
 $ ctags --list-features
