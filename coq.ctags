@@ -78,7 +78,7 @@
 --_mtable-regex-Coq=trySkipEnclosed/\(//{pcre2}{tenter=paren}
 --_mtable-regex-Coq=trySkipEnclosed/\{//{pcre2}{tenter=brace}
 --_mtable-regex-Coq=trySkipEnclosed/\[//{pcre2}{tenter=bracket}
---_mtable-regex-Coq=trySkipEnclosed/(?:(:?lazy|multi)_?)?match\b//{pcre2}{tenter=match}
+--_mtable-regex-Coq=trySkipEnclosed/(?:(?:lazy|multi)_?)?match\b//{pcre2}{tenter=match}
 
 # https://coq.inria.fr/refman/language/core/basic.html#grammar-token-string
 # NOTE: no `skip`/`trySkipEnclosed` here
