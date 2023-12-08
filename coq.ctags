@@ -63,7 +63,7 @@
 # Example: strings (may contain anything), binders (may contain `:=`),
 # match-end (may contain `with`).
 # https://coq.inria.fr/refman/language/core/assumptions.html#grammar-token-binder
-# NOTE: This talbe should come after `skip` table.
+# NOTE: This table should come after `skip` table.
 --_tabledef-Coq=trySkipEnclosed
 
 --_tabledef-Coq=string
@@ -78,7 +78,7 @@
 --_mtable-regex-Coq=trySkipEnclosed/\(//{pcre2}{tenter=paren}
 --_mtable-regex-Coq=trySkipEnclosed/\{//{pcre2}{tenter=brace}
 --_mtable-regex-Coq=trySkipEnclosed/\[//{pcre2}{tenter=bracket}
---_mtable-regex-Coq=trySkipEnclosed/(?:(:?lazy|multi)_?)?match\b//{pcre2}{tenter=match}
+--_mtable-regex-Coq=trySkipEnclosed/(?:(?:lazy|multi)_?)?match\b//{pcre2}{tenter=match}
 
 # https://coq.inria.fr/refman/language/core/basic.html#grammar-token-string
 # NOTE: no `skip`/`trySkipEnclosed` here
@@ -166,7 +166,7 @@
 # https://coq.inria.fr/refman/addendum/type-classes.html#coq:cmd.Instance
 --_mtable-extend-Coq=instance+skip
 --_mtable-regex-Coq=instance/([^]!"#$%&'()*+,-.\/:;<=>?@[\`{|}~[:space:]^][^]!"#$%&()*+,-.\/:;<=>?@[\`{|}~[:space:]^]*)/\1/d/{pcre2}{tjump=skipToNextSentence}
-# anonymouse instance
+# anonymous instance
 --_mtable-regex-Coq=instance/.//{pcre2}{tjump=skipToNextSentence}
 # }}}
 
